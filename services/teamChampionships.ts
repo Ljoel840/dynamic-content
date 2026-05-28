@@ -1,3 +1,5 @@
+import { getApiUrl } from './apiConfig';
+
 export interface TeamChampionshipAssignment {
   id?: string;
   teamId: string;
@@ -20,7 +22,7 @@ const readAssignments = (): TeamChampionshipAssignment[] => {
 const writeAssignments = (assignments: TeamChampionshipAssignment[]) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(assignments));
 };
-const API_BASE = '/api/team-championships';
+const API_BASE =  getApiUrl('team-championships');
 
 const tryFetchJson = async (input: RequestInfo, init?: RequestInit) => {
   try {
@@ -33,7 +35,7 @@ const tryFetchJson = async (input: RequestInfo, init?: RequestInit) => {
 };
 
 export const getTeamChampionshipAssignments = async (): Promise<TeamChampionshipAssignment[]> => {
-  const remote = await tryFetchJson(API_BASE);
+  const remote = await tryFetchJson(`${API_BASE}getteamchampionships`);
   if (remote) return remote as TeamChampionshipAssignment[];
   return readAssignments();
 };
@@ -43,7 +45,8 @@ export const assignTeamToChampionship = async (
   championshipId: string,
 ): Promise<TeamChampionshipAssignment[]> => {
   const body = { teamId, championshipId };
-  const remote = await tryFetchJson(API_BASE, {
+  console.log('Assigning team to championship with body:', body);
+  const remote = await tryFetchJson(`${API_BASE}addteamchampionships`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
